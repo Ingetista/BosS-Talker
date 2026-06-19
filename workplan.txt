@@ -1,0 +1,18 @@
+boss-talker/
+│
+├── .env                  # Variables de entorno secretas (Tokens, API Keys) - ¡NUNCA se sube a GitHub!
+├── .gitignore            # Archivos que Git debe ignorar (.env, __pycache__, base de datos)
+├── README.md             # La carta de presentación de tu proyecto (Instrucciones, arquitectura)
+├── requirements.txt      # Librerías necesarias para que el proyecto corra
+├── main.py               # Punto de entrada. Inicializa el bot y carga los módulos
+│
+├── database/             # Todo lo relacionado con la persistencia SQL
+│   ├── __init__.py
+│   ├── connection.py     # Manejo de la conexión asíncrona a SQLite
+│   └── queries.py        # Funciones puras de SQL (INSERT, SELECT, DELETE)
+│
+└── cogs/                 # Módulos independientes del bot (Eventos y Comandos)
+    ├── __init__.py
+    ├── stalker.py        # Módulo de monitoreo de actividad (on_presence_update)
+    ├── summarizer.py     # Módulo de resúmenes de chat con IA
+    └── general.py        # Comandos básicos (help, ping, etc.)
