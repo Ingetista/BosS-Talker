@@ -1,17 +1,29 @@
 import aiosqlite
 import os
 
-# Definimos la ruta de la base de datos en la raíz del proyecto
+# Definimos la ruta de la base de datos en la raíz del proyecto para local
 DB_PATH = "boss_talker.db"
 
-async def init_db():
+async def get_db_connection():
+    """
+    Retorna la conexión correcta a la base de datos.
+    Si está en Render, la monta en la memoria RAM (:memory:).
+    Si está en local, usa el archivo físico en la raíz.
+    """
+    # Render inyecta automáticamente la variable de entorno RENDER=true
+    if os.getenv("RENDER"):
+        print("☁️ [Database] Detectado entorno Render. Conectando a la memoria RAM (:memory:)...")
+        return await aiosqlite.connect(":memory:")
     
+    return await aiosqlite.connect(DB_PATH)
+
+async def init_db():
     """
     Inicializa la base de datos local y crea las tablas necesarias
     si no existen en el sistema.
-    
     """
-    async with aiosqlite.connect(DB_PATH) as db:
+    # Usamos la función inteligente para obtener la conexión adecuada
+    async with await get_db_connection() as db:
         
         # 1. Tabla para configurar el canal de alertas de cada servidor de Discord
         await db.execute("""
@@ -35,9 +47,9 @@ async def init_db():
         """
         DETALLITO: Implementé TEXT para guardar los IDs de Discord como strings, 
         ya que pueden ser números muy grandes y podrían generar desbordamiento de Bits.
-        
         """
         
-        # Guardamos los cambios en el archivo físico
+        # Guardamos los cambios
         await db.commit()
+        
     print("💾 [Database] Base de datos inicializada y tablas verificadas/creadas.")
