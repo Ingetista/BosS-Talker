@@ -74,6 +74,9 @@ class BossTalker(commands.Bot):
 
 # Función principal para arrancar el script asíncronamente
 async def main():
+    
+    discord.utils.setup_logging() # Encendí los logs de discord para encontrar errores
+    
     if not TOKEN:
         print("❌ [Error Crítico] No se encontró el DISCORD_TOKEN en las variables de entorno.")
         return
