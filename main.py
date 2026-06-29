@@ -3,9 +3,25 @@ import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
+from threading import Thread
+from flask import Flask
+from database.connection import init_db # Importamos la función de inicialización de nuestra capa de datos
 
-# Importamos la función de inicialización de nuestra capa de datos
-from database.connection import init_db
+# Creo una mini aplicación Flask para mantener el bot activo en Render
+app = Flask(' ')
+
+@app.route('/')
+def home():
+    return "BosS-Talker está activo 24/7 y patrullando Discord."
+
+def run_flask():
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host='0.0.0.0', port=port)
+    
+def keep_alive():   # Arranca el servidor con un hilo secundario
+    t = Thread(target=run_flask)
+    t.start()
+
 
 # Cargamos las variables de entorno del archivo .env
 load_dotenv()
@@ -90,6 +106,7 @@ async def main():
     
     # Context manager para asegurar el cierre limpio de recursos
     async with bot:
+        keep_alive()
         await bot.start(TOKEN)
 
 if __name__ == "__main__":
