@@ -1,29 +1,27 @@
 import aiosqlite
 import os
 
-# Definimos la ruta de la base de datos en la raíz del proyecto para local
+# Definimos la ruta de la base de datos física para tu PC local
 DB_PATH = "boss_talker.db"
 
-async def get_db_connection():
+def get_db_path():
     """
-    Retorna la conexión correcta a la base de datos.
-    Si está en Render, la monta en la memoria RAM (:memory:).
-    Si está en local, usa el archivo físico en la raíz.
+    Retorna el string de conexión correcto según el entorno.
     """
-    # Render inyecta automáticamente la variable de entorno RENDER=true
     if os.getenv("RENDER"):
-        print("☁️ [Database] Detectado entorno Render. Conectando a la memoria RAM (:memory:)...")
-        return await aiosqlite.connect(":memory:")
-    
-    return await aiosqlite.connect(DB_PATH)
+        print("☁️ [Database] Detectado entorno Render. Apuntando a la memoria RAM (:memory:)...")
+        return ":memory:"
+    return DB_PATH
 
 async def init_db():
     """
-    Inicializa la base de datos local y crea las tablas necesarias
-    si no existen en el sistema.
+    Inicializa la base de datos local y crea las tablas necesarias.
     """
-    # Usamos la función inteligente para obtener la conexión adecuada
-    async with await get_db_connection() as db:
+    # Obtenemos la ruta correcta directamente sin crear conexiones intermedias rotas
+    path = get_db_path()
+    
+    # La sintaxis correcta y limpia de aiosqlite es simplemente 'async with aiosqlite.connect(...)'
+    async with aiosqlite.connect(path) as db:
         
         # 1. Tabla para configurar el canal de alertas de cada servidor de Discord
         await db.execute("""
@@ -44,12 +42,7 @@ async def init_db():
             )
         """)
         
-        """
-        DETALLITO: Implementé TEXT para guardar los IDs de Discord como strings, 
-        ya que pueden ser números muy grandes y podrían generar desbordamiento de Bits.
-        """
-        
         # Guardamos los cambios
         await db.commit()
         
-    print("💾 [Database] Base de datos inicializada y tablas verificadas/creadas.")
+    print("💾 [Database] Base de datos inicializada y tablas verificadas/creadas con éxito.")
