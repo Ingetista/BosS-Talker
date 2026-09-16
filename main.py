@@ -3,33 +3,13 @@ import asyncio
 import discord
 from discord.ext import commands
 from dotenv import load_dotenv
-from threading import Thread
-from flask import Flask
 from database.connection import init_db
-
-# 1. Configuración limpia de Flask (Keep-Alive para Render)
-app = Flask(' ')
-
-@app.route('/')
-def home():
-    return "BosS-Talker está activo 24/7 y patrullando Discord. 🚀"
-
-def run_flask():
-    port = int(os.environ.get("PORT", 8080))
-    # use_reloader=False evita que Flask intente duplicar el proceso en la nube
-    app.run(host='0.0.0.0', port=port, debug=False, use_reloader=False)
-    
-def keep_alive():   
-    # daemon=True asegura que corra de fondo sin congelar a Discord
-    t = Thread(target=run_flask, daemon=True)
-    t.start()
-    print("🌐 [Keep-Alive] Servidor web espejo iniciado de fondo.")
 
 # Cargamos las variables de entorno
 load_dotenv()
 TOKEN = os.getenv("DISCORD_TOKEN")
 
-# 2. Configuración estricta de la clase BossTalker
+# Configuración estricta de la clase BossTalker
 class BossTalker(commands.Bot):
     def __init__(self):
         intents = discord.Intents.default()
@@ -84,8 +64,6 @@ async def main():
     bot = BossTalker()
     
     async with bot:
-        # Lanzamos el servidor de supervivencia en su hilo demonio
-        keep_alive()
         # Encendemos el bot de Discord
         await bot.start(TOKEN)
 
