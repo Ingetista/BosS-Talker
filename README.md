@@ -79,3 +79,5 @@ pm2 start "python3 main.py" --name boss-talker
 **Ingetista**  
 Electronic & Firmware Engineer  
 [LinkedIn](https://www.linkedin.com/in/carlos-lópez-7a166a1b9)
+
+Engineering is art.
